@@ -4,9 +4,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import ru.netology.moneytransfer.model.AuthInfo;
 import ru.netology.moneytransfer.model.Login;
 
+@RestController
 public class LoginController {
     private static final String LOGIN_ENDPOINT = "login";
     private static final String LOGOUT_ENDPOINT = "logout";
