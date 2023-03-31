@@ -3,6 +3,7 @@ package ru.netology.moneytransfer.controller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.netology.moneytransfer.model.FileData;
 import ru.netology.moneytransfer.model.FileInfo;
 import ru.netology.moneytransfer.model.FileName;
@@ -17,7 +18,7 @@ public class CloudController {
 
     @PostMapping(path = FILE_ENDPOINT, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> upload(
-        @RequestHeader(name = "auth-token") String authToken, @RequestParam String filename, @RequestBody FileData fileData
+        @RequestHeader(name = "auth-token") String authToken, @RequestParam String filename, @RequestBody MultipartFile file
     ) {
         // TODO
         return ResponseEntity.ok("Success upload");
@@ -54,6 +55,8 @@ public class CloudController {
     ) {
         // TODO
         List<FileInfo> list = new ArrayList<>();
+        list.add(new FileInfo("test.jpg", 2434324234L));
+        list.add(new FileInfo("test2.jpg", 1243L));
         return ResponseEntity.ok(list);
     }
 }

@@ -1,11 +1,13 @@
-package ru.netology.moneytransfer.model;
+package ru.netology.moneytransfer.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class AuthInfo {
+@NoArgsConstructor
+public class Credential {
     private String login;
     private String password;
 }
