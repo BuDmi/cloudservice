@@ -10,10 +10,9 @@ import ru.netology.moneytransfer.model.FileName;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController("cloud")
 public class CloudController {
-    private static final String FILE_ENDPOINT = "/file";
-    private static final String LIST_ENDPOINT = "/list";
+    private static final String FILE_ENDPOINT = "file";
+    private static final String LIST_ENDPOINT = "list";
 
     @PostMapping(path = FILE_ENDPOINT, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> upload(
