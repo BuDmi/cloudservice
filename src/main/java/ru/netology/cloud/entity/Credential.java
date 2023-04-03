@@ -22,4 +22,5 @@ public class Credential implements Serializable {
     @OneToMany
     @PrimaryKeyJoinColumn
     private List<FileEntity> fileEntities;
+    private String token;
 }

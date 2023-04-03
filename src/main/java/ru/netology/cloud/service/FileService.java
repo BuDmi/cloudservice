@@ -1,11 +1,11 @@
 package ru.netology.cloud.service;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.netology.cloud.entity.Credential;
 import ru.netology.cloud.entity.FileEntity;
 import ru.netology.cloud.exception.ErrorDeleteFile;
 import ru.netology.cloud.exception.ErrorInputData;
@@ -22,12 +22,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class FileService {
     private FileRepository fileRepository;
+    private CredentialService credentialService;
 
     @Transactional
     public void saveFile(String token, String filename, MultipartFile file) throws IOException {
-//        String login = UserService.getUserName(token);
-        String login = "dee";
-        if (fileRepository.findByFilenameAndLogin(filename, login).isPresent()) {
+        Credential credential = credentialService.findByToken(token);
+        long credentialId = credential.getId();
+        if (fileRepository.findByFilenameAndCredentialId(filename, credentialId).isPresent()) {
             throw new ErrorInputData(
                 ("Please delete firstly the existed file with the name " + filename +
                     " before loading your new file with the same name"));
@@ -37,15 +38,14 @@ public class FileService {
         fileEntity.setContentType(file.getContentType());
         fileEntity.setData(file.getBytes());
         fileEntity.setSize(file.getSize());
-        fileEntity.setLogin(login);
+        fileEntity.setCredential(credential);
         fileRepository.save(fileEntity);
     }
 
     @Transactional
     public FileEntity getFile(String token, String filename) {
-//        String userName = UserService.getUserName(token);
-        String login = "dee";
-        Optional<FileEntity> fileEntityOptional = fileRepository.findByFilenameAndLogin(filename, login);
+        long credentialId = credentialService.findByToken(token).getId();
+        Optional<FileEntity> fileEntityOptional = fileRepository.findByFilenameAndCredentialId(filename, credentialId);
         if (!fileEntityOptional.isPresent()) {
             throw new ErrorInputData("the file " + filename + " does not exist");
         }
@@ -54,12 +54,11 @@ public class FileService {
 
     @Transactional
     public void deleteFile(String token, String filename) {
-//        String userName = UserService.getUserName(token);
-        String login = "dee";
-        if (!fileRepository.findByFilenameAndLogin(filename, login).isPresent()) {
+        long credentialId = credentialService.findByToken(token).getId();
+        if (!fileRepository.findByFilenameAndCredentialId(filename, credentialId).isPresent()) {
             throw new ErrorInputData("the file " + filename + " does not exist");
         }
-        Long res = fileRepository.deleteByLoginAndFilename(login, filename);
+        Long res = fileRepository.deleteByCredentialIdAndFilename(credentialId, filename);
         if (res <= 0) {
             throw new ErrorDeleteFile("Error on deleting of" + filename);
         }
@@ -67,17 +66,15 @@ public class FileService {
 
     @Transactional
     public void updateFilename(String token, String filenameOld, String filenameNew) {
-//        String userName = UserService.getUserName(token);
-        String login = "dee";
-        fileRepository.updateFilename(filenameNew, login, filenameOld);
+        long credentialId = credentialService.findByToken(token).getId();
+        fileRepository.updateFilename(filenameNew, credentialId, filenameOld);
     }
 
     @Transactional
     public List<FileInfo> getFileList(String token, int limit) {
-//        String userName = UserService.getUserName(token);
-        String login = "dee";
+        long credentialId = credentialService.findByToken(token).getId();
         Pageable topN = PageRequest.of(0, limit);
-        return fileRepository.findByLoginOrderByFilename(login, topN)
+        return fileRepository.findByCredentialIdOrderByFilename(credentialId, topN)
             .stream().map(it -> new FileInfo(it.getFilename(), it.getSize().intValue())).collect(Collectors.toList());
     }
 }

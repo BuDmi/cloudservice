@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FileRepository extends JpaRepository<FileEntity, Long> {
-    List<FileEntity> findByLoginOrderByFilename(String login, Pageable topN);
-    Optional<FileEntity> findByFilenameAndLogin(String filename, String login);
-    Long deleteByLoginAndFilename(String login, String filename);
+    List<FileEntity> findByCredentialIdOrderByFilename(long credentialId, Pageable topN);
+    Optional<FileEntity> findByFilenameAndCredentialId(String filename, long credentialId);
+    Long deleteByCredentialIdAndFilename(long credentialId, String filename);
     @Modifying
-    @Query(value = "UPDATE files SET filename = :filenameNew WHERE filename = :filenameOld and login = :login",
+    @Query(value = "UPDATE files SET filename = :filenameNew WHERE filename = :filenameOld and credential_id = :credentialId",
         nativeQuery = true)
     void updateFilename(@Param("filenameNew") String filenameNew,
-                        @Param("login") String login,
+                        @Param("credentialId") long credentialId,
                         @Param("filenameOld") String filenameOld);
 }
