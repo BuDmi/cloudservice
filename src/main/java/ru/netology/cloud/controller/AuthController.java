@@ -2,10 +2,8 @@ package ru.netology.cloud.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.netology.cloud.config.CrossOriginParams;
 import ru.netology.cloud.entity.Credential;
 import ru.netology.cloud.exception.UnauthorizedError;
 import ru.netology.cloud.model.Login;
@@ -20,6 +18,7 @@ public class AuthController {
     private CredentialService credentialService;
 
     @PostMapping(path = LOGIN_ENDPOINT)
+    @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<Login> login(@RequestBody Credential credential) {
         if (credentialService.isCredentialCorrect(credential)) {
             String authToken = "1"; // TODO
@@ -30,6 +29,7 @@ public class AuthController {
     }
 
     @PostMapping(path = LOGOUT_ENDPOINT)
+    @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<String> logout(@RequestHeader(name = "auth-token") String authToken) {
         return ResponseEntity.ok("Success logout");
     }

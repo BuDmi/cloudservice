@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.netology.cloud.config.CrossOriginParams;
 import ru.netology.cloud.entity.FileEntity;
 import ru.netology.cloud.model.FileInfo;
 import ru.netology.cloud.model.FileName;
@@ -22,6 +23,7 @@ public class CloudController {
     private FileService fileService;
 
     @PostMapping(path = FILE_ENDPOINT, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<String> upload(
         @RequestHeader(name = "auth-token") String authToken,
         @RequestParam String filename,
@@ -32,6 +34,7 @@ public class CloudController {
     }
 
     @DeleteMapping(path = FILE_ENDPOINT)
+    @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<String> delete(
         @RequestHeader(name = "auth-token") String authToken, @RequestParam String filename
     ) {
@@ -40,6 +43,7 @@ public class CloudController {
     }
 
     @GetMapping(path = FILE_ENDPOINT)
+    @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<byte[]> download(
         @RequestHeader(name = "auth-token") String authToken, @RequestParam String filename
     ) {
@@ -51,16 +55,18 @@ public class CloudController {
     }
 
     @PutMapping(path = FILE_ENDPOINT)
+    @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<String> edit(
         @RequestHeader(name = "auth-token") String authToken,
         @RequestParam (name = "filename") String filenameOld,
         @RequestBody FileName filenameNew
     ) {
-        fileService.updateFilename(authToken, filenameOld, filenameNew.getName());
+        fileService.updateFilename(authToken, filenameOld, filenameNew.getFilename());
         return ResponseEntity.ok("Success upload");
     }
 
     @GetMapping(path = LIST_ENDPOINT)
+    @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<List<FileInfo>> getAll(
         @RequestHeader(name = "auth-token") String authToken, @RequestParam int limit
     ) {
