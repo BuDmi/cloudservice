@@ -13,7 +13,7 @@ import ru.netology.cloud.service.CredentialService;
 
 @RestController
 @AllArgsConstructor
-public class LoginController {
+public class AuthController {
     private static final String LOGIN_ENDPOINT = "login";
     private static final String LOGOUT_ENDPOINT = "logout";
 
