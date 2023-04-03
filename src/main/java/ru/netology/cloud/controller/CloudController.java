@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloud.config.CrossOriginParams;
 import ru.netology.cloud.entity.FileEntity;
+import ru.netology.cloud.exception.UnauthorizedError;
 import ru.netology.cloud.model.FileInfo;
 import ru.netology.cloud.model.FileName;
+import ru.netology.cloud.service.BlackListTokenService;
 import ru.netology.cloud.service.FileService;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ public class CloudController {
     private static final String FILE_ENDPOINT = "file";
     private static final String LIST_ENDPOINT = "list";
     private FileService fileService;
+    private BlackListTokenService blackListTokenService;
 
     @PostMapping(path = FILE_ENDPOINT, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
@@ -29,7 +32,11 @@ public class CloudController {
         @RequestParam String filename,
         @RequestBody MultipartFile file
     ) throws IOException {
-        fileService.saveFile(authToken, filename, file);
+        String clearedAuthToken = authToken.replace("Bearer ", "");
+        if (blackListTokenService.isTokenInBlackList(clearedAuthToken)) {
+            throw new UnauthorizedError("Token is in black list");
+        }
+        fileService.saveFile(clearedAuthToken, filename, file);
         return ResponseEntity.ok("Success upload");
     }
 
@@ -38,7 +45,11 @@ public class CloudController {
     public ResponseEntity<String> delete(
         @RequestHeader(name = "auth-token") String authToken, @RequestParam String filename
     ) {
-        fileService.deleteFile(authToken, filename);
+        String clearedAuthToken = authToken.replace("Bearer ", "");
+        if (blackListTokenService.isTokenInBlackList(clearedAuthToken)) {
+            throw new UnauthorizedError("Token is in black list");
+        }
+        fileService.deleteFile(clearedAuthToken, filename);
         return ResponseEntity.ok().build();
     }
 
@@ -47,7 +58,11 @@ public class CloudController {
     public ResponseEntity<byte[]> download(
         @RequestHeader(name = "auth-token") String authToken, @RequestParam String filename
     ) {
-        FileEntity fileEntity = fileService.getFile(authToken, filename);
+        String clearedAuthToken = authToken.replace("Bearer ", "");
+        if (blackListTokenService.isTokenInBlackList(clearedAuthToken)) {
+            throw new UnauthorizedError("Token is in black list");
+        }
+        FileEntity fileEntity = fileService.getFile(clearedAuthToken, filename);
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getFilename() + "\"")
             .contentType(MediaType.valueOf(fileEntity.getContentType()))
@@ -61,7 +76,11 @@ public class CloudController {
         @RequestParam (name = "filename") String filenameOld,
         @RequestBody FileName filenameNew
     ) {
-        fileService.updateFilename(authToken, filenameOld, filenameNew.getFilename());
+        String clearedAuthToken = authToken.replace("Bearer ", "");
+        if (blackListTokenService.isTokenInBlackList(clearedAuthToken)) {
+            throw new UnauthorizedError("Token is in black list");
+        }
+        fileService.updateFilename(clearedAuthToken, filenameOld, filenameNew.getFilename());
         return ResponseEntity.ok("Success upload");
     }
 
@@ -70,6 +89,10 @@ public class CloudController {
     public ResponseEntity<List<FileInfo>> getAll(
         @RequestHeader(name = "auth-token") String authToken, @RequestParam int limit
     ) {
-        return ResponseEntity.ok(fileService.getFileList(authToken, limit));
+        String clearedAuthToken = authToken.replace("Bearer ", "");
+        if (blackListTokenService.isTokenInBlackList(clearedAuthToken)) {
+            throw new UnauthorizedError("Token is in black list");
+        }
+        return ResponseEntity.ok(fileService.getFileList(clearedAuthToken, limit));
     }
 }

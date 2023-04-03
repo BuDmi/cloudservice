@@ -23,24 +23,40 @@ public class CredentialService {
         }
     }
 
-    public Credential findUserByLogin(String login) {
-        Optional<Credential> credential = credentialRepository.findByLogin(login);
-        String encoded;
-        if (credential.isPresent()) {
-           encoded = credential.get().getPassword();//passwordEncoder.encode(CharBuffer.wrap(user.getCredential().getPassword()));
-            return credential.get();
-        } else {
-            throw new BadCredentials("Invalid login or password");
-        }
-        //passwordEncoder.matches(CharBuffer.wrap(user.getCredential().getPassword()), encoded) ? user : null;
-    }
-
     public Credential findByToken(String token) {
-        Optional<Credential> credential = credentialRepository.findByToken(token.replace("Bearer ", ""));
+        Optional<Credential> credential = credentialRepository.findByToken(token);
         if (credential.isPresent()) {
             return credential.get();
         } else {
             throw new UnauthorizedError("Invalid token");
         }
+    }
+
+    public void updateToken(String login, String token) {
+        long credentialId = findCredentialIdByLogin(login);
+        credentialRepository.updateTokenById(token, credentialId);
+    }
+
+    private long findCredentialIdByLogin(String login) {
+        Optional<Credential> credential = credentialRepository.findByLogin(login);
+        if (credential.isPresent()) {
+            return credential.get().getId();
+        } else {
+            throw new BadCredentials("Invalid login");
+        }
+    }
+
+    private long findCredentialIdByToken(String token) {
+        Optional<Credential> credential = credentialRepository.findByToken(token);
+        if (credential.isPresent()) {
+            return credential.get().getId();
+        } else {
+            throw new BadCredentials("Invalid token");
+        }
+    }
+
+    public void clearToken(String token) {
+        long credentialId = findCredentialIdByToken(token);
+        credentialRepository.updateTokenById("0", credentialId);
     }
 }

@@ -7,6 +7,7 @@ import ru.netology.cloud.config.CrossOriginParams;
 import ru.netology.cloud.entity.Credential;
 import ru.netology.cloud.exception.UnauthorizedError;
 import ru.netology.cloud.model.Login;
+import ru.netology.cloud.service.BlackListTokenService;
 import ru.netology.cloud.service.CredentialService;
 
 @RestController
@@ -16,12 +17,14 @@ public class AuthController {
     private static final String LOGOUT_ENDPOINT = "logout";
 
     private CredentialService credentialService;
+    private BlackListTokenService blackListTokenService;
 
     @PostMapping(path = LOGIN_ENDPOINT)
     @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<Login> login(@RequestBody Credential credential) {
         if (credentialService.isCredentialCorrect(credential)) {
             String authToken = "1"; // TODO
+            credentialService.updateToken(credential.getLogin(), authToken);
             return ResponseEntity.ok(new Login(authToken));
         } else {
             throw new UnauthorizedError("Invalid credential");
@@ -31,6 +34,9 @@ public class AuthController {
     @PostMapping(path = LOGOUT_ENDPOINT)
     @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<String> logout(@RequestHeader(name = "auth-token") String authToken) {
+        String clearedAuthToken = authToken.replace("Bearer ", "");
+        credentialService.clearToken(clearedAuthToken);
+        blackListTokenService.addToken(clearedAuthToken);
         return ResponseEntity.ok("Success logout");
     }
 }
