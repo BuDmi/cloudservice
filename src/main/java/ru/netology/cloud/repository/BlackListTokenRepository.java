@@ -10,8 +10,4 @@ import java.util.Optional;
 
 public interface BlackListTokenRepository extends JpaRepository<BlackListTokens, Long> {
     Optional<BlackListTokens> findByToken(String token);
-    @Modifying
-    @Query(value = "INSERT INTO black_list_tokens (token) VALUES (:token)",
-        nativeQuery = true)
-    void addNewToken(@Param("token") String token);
 }

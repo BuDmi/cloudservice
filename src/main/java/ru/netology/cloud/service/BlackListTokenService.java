@@ -2,6 +2,7 @@ package ru.netology.cloud.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.netology.cloud.entity.BlackListTokens;
 import ru.netology.cloud.repository.BlackListTokenRepository;
 
 @Service
@@ -14,6 +15,8 @@ public class BlackListTokenService {
     }
 
     public void addToken(String token) {
-        blackListTokenRepository.addNewToken(token);
+        BlackListTokens blackListTokens = new BlackListTokens();
+        blackListTokens.setToken(token);
+        blackListTokenRepository.save(blackListTokens);
     }
 }
