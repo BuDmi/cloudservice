@@ -26,7 +26,6 @@ public class AuthController {
     @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<Login> login(@RequestBody Credential credential) {
         if (credentialService.isCredentialCorrect(credential)) {
-//            String authToken = "1"; // TODO
             Credential c = credentialService.findByCredential(credential);
             String authToken = userAuthenticationProvider.createToken(c.getLogin());
             credentialService.updateToken(credential.getLogin(), authToken);

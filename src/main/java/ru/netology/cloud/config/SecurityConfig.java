@@ -25,8 +25,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     private final UserAuthenticationProvider userAuthenticationProvider;
     private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
     private static final String LOGIN_URL = "/login*";
-    private static final String FILE_URL = "/file*";
-    private final String ORIGIN_URL = "http://127.0.0.1:8080";
 
     @Bean
     public SecurityFilterChain security(HttpSecurity http) throws Exception {
@@ -36,7 +34,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 CorsRegistry registry = new CorsRegistry();
                 registry.addMapping("/**")
                     .allowCredentials(true)
-                    .allowedOrigins(ORIGIN_URL)
+                    .allowedOrigins(CrossOriginParams.CROSS_ORIGIN)
                     .allowedMethods(String.valueOf(HttpMethod.POST),
                         String.valueOf(HttpMethod.DELETE),
                         String.valueOf(HttpMethod.GET),
@@ -57,7 +55,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .anyRequest()
                         .authenticated()
                         .and()
-                        .logout(logout -> logout.permitAll()
+                        .logout(logout -> logout.logoutUrl("/base-logout").permitAll()
                             .logoutSuccessHandler((request1, response, authentication) -> {
                                 response.setStatus(HttpServletResponse.SC_OK);
                             }));
