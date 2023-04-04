@@ -1,25 +1,48 @@
 package ru.netology.cloud.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.netology.cloud.entity.Credential;
 import ru.netology.cloud.exception.BadCredentials;
 import ru.netology.cloud.exception.UnauthorizedError;
 import ru.netology.cloud.repository.CredentialRepository;
 
+import java.nio.CharBuffer;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class CredentialService {
     private CredentialRepository credentialRepository;
+    private PasswordEncoder passwordEncoder;
 
     public boolean isCredentialCorrect(Credential credential) {
         Optional<Credential> c = credentialRepository.findByLogin(credential.getLogin());
         if (c.isPresent()) {
-            return c.get().getPassword().equals(credential.getPassword());
+            String encoded = passwordEncoder.encode(CharBuffer.wrap(c.get().getPassword()));
+            return passwordEncoder.matches(CharBuffer.wrap(c.get().getPassword()), encoded);
         } else {
             throw new UnauthorizedError("Invalid login or password");
+        }
+    }
+
+    public Credential findByCredential(Credential credential) {
+        Optional<Credential> c =
+            credentialRepository.findCredentialByLoginAndPassword(credential.getLogin(), credential.getPassword());
+        if (c.isPresent()) {
+            return c.get();
+        } else {
+            throw new UnauthorizedError("Invalid login");
+        }
+    }
+
+    public Credential findByLogin(String login) {
+        Optional<Credential> credential = credentialRepository.findByLogin(login);
+        if (credential.isPresent()) {
+            return credential.get();
+        } else {
+            throw new UnauthorizedError("Invalid login");
         }
     }
 

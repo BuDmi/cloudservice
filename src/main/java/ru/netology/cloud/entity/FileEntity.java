@@ -1,10 +1,10 @@
 package ru.netology.cloud.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -25,6 +25,6 @@ public class FileEntity implements Serializable {
 
     @Lob
     private byte[] data;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Credential credential;
 }

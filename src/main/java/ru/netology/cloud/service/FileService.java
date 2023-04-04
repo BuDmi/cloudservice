@@ -1,5 +1,6 @@
 package ru.netology.cloud.service;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,11 +13,9 @@ import ru.netology.cloud.exception.ErrorInputData;
 import ru.netology.cloud.model.FileInfo;
 import ru.netology.cloud.repository.FileRepository;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -46,7 +45,7 @@ public class FileService {
     public FileEntity getFile(String token, String filename) {
         long credentialId = credentialService.findByToken(token).getId();
         Optional<FileEntity> fileEntityOptional = fileRepository.findByFilenameAndCredentialId(filename, credentialId);
-        if (!fileEntityOptional.isPresent()) {
+        if (fileEntityOptional.isEmpty()) {
             throw new ErrorInputData("the file " + filename + " does not exist");
         }
         return fileEntityOptional.get();
@@ -55,7 +54,7 @@ public class FileService {
     @Transactional
     public void deleteFile(String token, String filename) {
         long credentialId = credentialService.findByToken(token).getId();
-        if (!fileRepository.findByFilenameAndCredentialId(filename, credentialId).isPresent()) {
+        if (fileRepository.findByFilenameAndCredentialId(filename, credentialId).isEmpty()) {
             throw new ErrorInputData("the file " + filename + " does not exist");
         }
         Long res = fileRepository.deleteByCredentialIdAndFilename(credentialId, filename);
@@ -75,6 +74,6 @@ public class FileService {
         long credentialId = credentialService.findByToken(token).getId();
         Pageable topN = PageRequest.of(0, limit);
         return fileRepository.findByCredentialIdOrderByFilename(credentialId, topN)
-            .stream().map(it -> new FileInfo(it.getFilename(), it.getSize().intValue())).collect(Collectors.toList());
+            .stream().map(it -> new FileInfo(it.getFilename(), it.getSize().intValue())).toList();
     }
 }

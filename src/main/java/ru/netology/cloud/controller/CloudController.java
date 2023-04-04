@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloud.config.CrossOriginParams;
@@ -93,6 +94,8 @@ public class CloudController {
         if (blackListTokenService.isTokenInBlackList(clearedAuthToken)) {
             throw new UnauthorizedError("Token is in black list");
         }
-        return ResponseEntity.ok(fileService.getFileList(clearedAuthToken, limit));
+        List<FileInfo> f = fileService.getFileList(clearedAuthToken, limit);
+
+        return ResponseEntity.ok(f);
     }
 }
