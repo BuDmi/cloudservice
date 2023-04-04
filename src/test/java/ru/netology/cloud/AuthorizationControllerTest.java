@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.netology.cloud.controller.AuthController;
@@ -33,10 +32,8 @@ public class AuthorizationControllerTest {
     private CredentialRepository credentialRepository;
     @MockBean
     private BlackListTokenService blackListTokenService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    public CredentialService credentialService = new CredentialService(credentialRepository, passwordEncoder);
+    public CredentialService credentialService = new CredentialService(credentialRepository);
 
     private ObjectMapper objectMapper = new ObjectMapper();
 

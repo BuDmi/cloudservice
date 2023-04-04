@@ -25,14 +25,10 @@ public class AuthController {
     @PostMapping(path = LOGIN_ENDPOINT)
     @CrossOrigin(origins = CrossOriginParams.CROSS_ORIGIN, allowCredentials = CrossOriginParams.ALLOW_CREDENTIALS_VALUE)
     public ResponseEntity<Login> login(@RequestBody Credential credential) {
-        if (credentialService.isCredentialCorrect(credential)) {
-            Credential c = credentialService.findByCredential(credential);
-            String authToken = userAuthenticationProvider.createToken(c.getLogin());
-            credentialService.updateToken(credential.getLogin(), authToken);
-            return ResponseEntity.ok(new Login(authToken));
-        } else {
-            throw new UnauthorizedError("Invalid credential");
-        }
+        Credential c = credentialService.findByCredential(credential);
+        String authToken = userAuthenticationProvider.createToken(c.getLogin());
+        credentialService.updateToken(credential.getLogin(), authToken);
+        return ResponseEntity.ok(new Login(authToken));
     }
 
     @PostMapping(path = LOGOUT_ENDPOINT)
